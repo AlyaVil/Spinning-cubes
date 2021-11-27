@@ -1,0 +1,79 @@
+
+ArrayList<Box> boxes = new ArrayList<Box>();
+
+void setup(){
+  size(640, 640, P3D);
+  noStroke();
+  boxes = new ArrayList<Box>();
+  
+  while(boxes.size() < 50){
+    PVector loc = new PVector(random(width), random(height), random(0, -500)); 
+    float size = random(20, 50);
+    boolean isOverlapped = false;
+    for(Box box: boxes){
+      if(PVector.dist(loc, box.loc) < sqrt(sq(size) + sq(size * sqrt(2))) / 2 + sqrt(sq(box.size) + sq(box.size * sqrt(2))) / 2){
+        isOverlapped = true;
+        break;
+      }
+    }
+    if(!isOverlapped){
+      boxes.add(new Box(loc, size));
+    }
+  }
+}
+
+void draw(){
+  background(0);
+  lights();
+  for(Box box: boxes){
+    box.display();
+    box.update();
+  }
+}
+
+class Box{
+
+  PVector loc, ang, vel;
+  float size;
+  color c;
+  
+  Box(PVector _loc, float _size){
+    loc = _loc;
+    size = _size;
+    ang = new PVector(random(TWO_PI), random(TWO_PI), random(TWO_PI));
+    setRandomVel();
+    if(random(1) < 0.5){
+      c = color(50, 205, 50);
+    } else {
+      c = color(204, 49, 126);
+    }
+  }
+  
+  void setRandomVel(){
+    float x = (random(1) < 0.5 ? 1: - 1) * random(PI / 32, PI / 16);
+    float y = (random(1) < 0.5 ? 1: - 1) * random(PI / 32, PI / 16);
+    float z = (random(1) < 0.5 ? 1: - 1) * random(PI / 32, PI / 16);
+    vel = new PVector(x, y, z);
+  }
+  
+  void update(){
+    vel.mult(0.99);
+    if(random(1) < 0.001){
+      setRandomVel();
+    }
+    ang.add(vel);
+  }
+  
+  void display(){
+    fill(c);
+    pushMatrix();
+    translate(loc.x, loc.y, loc.z);
+    rotateX(ang.x);
+    rotateY(ang.y);
+    rotateZ(ang.z);
+    box(size);
+    popMatrix();
+  }
+  
+}
+
